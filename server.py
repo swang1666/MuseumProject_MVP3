@@ -142,7 +142,7 @@ def load_data():
         louvre_trans.update(json.load(f))
     print(f"  Louvre translations: {len(louvre_trans)}", flush=True)
 
-    embeddings = np.load(str(EMBEDDINGS_PATH))['embeddings'].astype(np.float32)
+    embeddings = np.load(str(EMBEDDINGS_PATH))['embeddings']
     print(f"  Embeddings: {embeddings.shape}", flush=True)
 
     with open(INDEX_PATH, "r", encoding="utf-8") as f:
@@ -167,7 +167,8 @@ def load_data():
 
 def cosine_scores(query_vec):
     """Compute cosine similarity between query and all embeddings."""
-    q_norm = query_vec / (np.linalg.norm(query_vec) + 1e-10)
+    q = query_vec.astype(np.float16)
+    q_norm = q / (np.linalg.norm(q) + 1e-10)
     return embeddings @ q_norm
 
 
