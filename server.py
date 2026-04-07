@@ -22,6 +22,7 @@ import time
 from collections import OrderedDict
 from pathlib import Path
 
+import aiohttp
 import anthropic
 import numpy as np
 from dotenv import load_dotenv
@@ -83,6 +84,7 @@ Respond with ONLY a JSON array, no other text: [{{"id": "artwork_id", "score": 8
 # ---------------------------------------------------------------------------
 artworks = {}          # id -> full record
 tags_dict = {}         # id -> [40 tags]
+tag_categories = {}    # tag -> category (medium_technique/style_period/subject_form/theme_concept)
 louvre_trans = {}       # louvre_id -> {title, medium, classification, description}
 embeddings = None      # np.ndarray (14000, 3072)
 index_list = []        # [{row, id, title, ...}, ...]
@@ -116,7 +118,7 @@ def get_or_compute_cosine(query, query_vec):
 
 
 def load_data():
-    global artworks, tags_dict, louvre_trans, embeddings, index_list, id_to_row
+    global artworks, tags_dict, tag_categories, louvre_trans, embeddings, index_list, id_to_row
     global openai_client, anthropic_client
 
     print("Loading data...", flush=True)
@@ -130,6 +132,11 @@ def load_data():
     with open(TAGS_PATH, "r", encoding="utf-8") as f:
         tags_dict.update(json.load(f))
     print(f"  Tags: {len(tags_dict)}", flush=True)
+
+    tag_cat_path = BASE / "tags" / "tag_categories.json"
+    with open(tag_cat_path, "r", encoding="utf-8") as f:
+        tag_categories.update(json.load(f))
+    print(f"  Tag categories: {len(tag_categories)}", flush=True)
 
     with open(TRANSLATIONS_PATH, "r", encoding="utf-8") as f:
         louvre_trans.update(json.load(f))
@@ -598,8 +605,141 @@ async def get_artwork(artwork_id: str):
     result = dict(rec)
     result["original_tags"] = rec.get("tags", [])
     result["llm_tags"] = tags_dict.get(artwork_id, [])
+    categorized = {"medium_technique": [], "style_period": [], "subject_form": [], "theme_concept": []}
+    for tag in result["llm_tags"]:
+        cat = tag_categories.get(tag, "theme_concept")
+        categorized[cat].append(tag)
+    result["categorized_tags"] = categorized
     result["louvre_translation"] = louvre_trans.get(artwork_id, None)
     return result
+
+
+@app.get("/api/artwork/{artwork_id}/research")
+async def get_research(artwork_id: str):
+    rec = artworks.get(artwork_id)
+    if rec is None:
+        from fastapi.responses import JSONResponse
+        return JSONResponse(status_code=404, content={"error": "Not found"})
+
+    tags = tags_dict.get(artwork_id, [])
+    search_terms = await _generate_search_terms(rec, tags)
+    papers = await _search_semantic_scholar(search_terms)
+
+    return {
+        "artwork_id": artwork_id,
+        "search_terms": search_terms,
+        "papers": papers,
+    }
+
+
+async def _generate_search_terms(record, tags):
+    title = record.get("title", "")
+    artist = record.get("artist", "")
+    culture = record.get("culture", "")
+    period = record.get("period", "")
+    medium = record.get("medium", "")
+    tag_str = ", ".join(tags[:15]) if tags else ""
+
+    prompt = f'''Based on this artwork's metadata and AI-generated tags, generate 3-5 academic search queries that a researcher might use to find papers about this specific work or closely related works.
+
+Artwork:
+Title: {title}
+Artist: {artist}
+Culture: {culture}
+Period: {period}
+Medium: {medium}
+Tags: {tag_str}
+
+Rules:
+- Include the artist's name in at least 2 queries (if artist is known)
+- Use discipline-specific vocabulary: iconographic terms, named art movements, specific techniques, material terms, cultural period names
+- Every query must contain at least one term that is specific to art, material culture, or visual studies (e.g., an artist name, a technique, a medium, an iconographic term, a named style/movement)
+- Do NOT use generic descriptive words (rural, nature, beauty, countryside, emotion) without pairing them with art-specific anchors
+- Queries should be 3-6 words, precise and targeted
+
+Return ONLY a JSON array of 3-5 strings, no other text.
+Example for an Impressionist landscape: ["Sisley plein air landscape technique", "Impressionist brushwork atmospheric effects", "French landscape painting 1870s Seine valley"]
+Example for an Egyptian sculpture: ["Isis lactans iconography Ptolemaic", "maternal deities Egyptian sculpture", "nursing imagery ancient Egyptian art"]'''
+
+    try:
+        response = await asyncio.to_thread(
+            anthropic_client.messages.create,
+            model=RERANK_MODEL,
+            max_tokens=256,
+            temperature=0,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = response.content[0].text.strip()
+        if "```" in raw:
+            m = re.search(r"```(?:json)?\s*([\s\S]+?)```", raw)
+            if m:
+                raw = m.group(1).strip()
+        terms = json.loads(raw)
+        if isinstance(terms, list):
+            return [str(t) for t in terms[:5]]
+    except Exception as e:
+        print(f"  Search term generation failed: {e}", flush=True)
+    return [f"{title} {artist} {culture}".strip()]
+
+
+async def _search_semantic_scholar(search_terms):
+    all_papers = []
+    seen_ids = set()
+
+    async with aiohttp.ClientSession() as session:
+        for term in search_terms:
+            try:
+                url = "https://api.semanticscholar.org/graph/v1/paper/search"
+                params = {
+                    "query": term,
+                    "limit": 5,
+                    "fields": "title,authors,year,citationCount,url,abstract,externalIds",
+                    "fieldsOfStudy": "Art,History,Philosophy,Sociology,Linguistics",
+                }
+                async with session.get(url, params=params,
+                                       timeout=aiohttp.ClientTimeout(total=10)) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        for paper in data.get("data", []):
+                            pid = paper.get("paperId", "")
+                            if pid and pid not in seen_ids:
+                                seen_ids.add(pid)
+                                all_papers.append({
+                                    "title": paper.get("title", ""),
+                                    "authors": [a.get("name", "")
+                                                for a in (paper.get("authors") or [])[:3]],
+                                    "year": paper.get("year"),
+                                    "citations": paper.get("citationCount", 0),
+                                    "url": paper.get("url", ""),
+                                    "abstract": (paper.get("abstract") or "")[:300],
+                                    "search_term": term,
+                                })
+                await asyncio.sleep(0.5)
+            except Exception as e:
+                print(f"  Semantic Scholar error for '{term[:40]}': {e}", flush=True)
+                continue
+
+    # Relevance scoring: papers mentioning search term keywords get priority
+    for paper in all_papers:
+        title_lower = (paper.get("title") or "").lower()
+        abstract_lower = (paper.get("abstract") or "").lower()
+        text = title_lower + " " + abstract_lower
+
+        relevance_hits = 0
+        for term in search_terms:
+            term_words = [w.lower() for w in term.split() if len(w) > 3]
+            for tw in term_words:
+                if tw in text:
+                    relevance_hits += 1
+
+        paper["_sort_score"] = relevance_hits * 10000 + min(paper.get("citations", 0), 9999)
+
+    all_papers.sort(key=lambda x: x.get("_sort_score", 0), reverse=True)
+
+    for paper in all_papers:
+        paper.pop("_sort_score", None)
+
+    return all_papers[:8]
 
 
 @app.get("/api/artworks")

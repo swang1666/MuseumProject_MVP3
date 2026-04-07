@@ -111,8 +111,47 @@
         }
         .suggestion-chip:hover { border-style: solid; color: var(--text-secondary); background: rgba(0,0,0,0.02); }
 
-        .gallery-wrapper { padding: 8px 16px 40px; }
+        .gallery-wrapper { padding: 8px 16px 40px; display: flex; gap: 0; }
+        .gallery-wrapper.browse-mode { display: block; }
+        .masonry-wrapper { flex: 1; min-width: 0; }
         .masonry { position: relative; }
+
+        .sidebar-filters {
+            width: 200px; min-width: 200px; padding: 8px 16px 40px 8px;
+            flex-shrink: 0;
+        }
+        .sidebar-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+        .sidebar-section:last-child { border-bottom: none; }
+        .sidebar-title {
+            font-size: 12px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--text-primary); margin-bottom: 10px;
+        }
+        .sidebar-option {
+            display: flex; align-items: center; gap: 8px; padding: 4px 0;
+            cursor: pointer; font-size: 13px; color: var(--text-secondary);
+            transition: color 0.2s; font-family: 'DM Sans', sans-serif;
+            background: none; border: none; width: 100%; text-align: left;
+        }
+        .sidebar-option:hover { color: var(--text-primary); }
+        .sidebar-option.active { color: var(--text-primary); font-weight: 500; }
+        .sidebar-option .check-box {
+            width: 14px; height: 14px; border: 1.5px solid var(--text-tertiary);
+            border-radius: 3px; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; transition: all 0.2s;
+        }
+        .sidebar-option.active .check-box { background: var(--text-primary); border-color: var(--text-primary); }
+        .sidebar-option .check-box::after {
+            content: ''; display: none; width: 4px; height: 7px;
+            border: solid white; border-width: 0 1.5px 1.5px 0;
+            transform: rotate(45deg); margin-bottom: 1px;
+        }
+        .sidebar-option.active .check-box::after { display: block; }
+        .sidebar-option .option-count { font-size: 11px; color: var(--text-tertiary); margin-left: auto; }
+
+        @media (max-width: 768px) {
+            .sidebar-filters { display: none !important; }
+            .gallery-wrapper { display: block !important; }
+        }
 
         .explore-more {
             display: none; text-align: center; padding: 32px 20px 48px;
@@ -233,29 +272,30 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-msg {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 20px; color: var(--text-secondary); margin-bottom: 8px;
+            font-size: 24px; color: var(--text-secondary); margin-bottom: 8px;
         }
-        .loading-sub { font-size: 13px; color: var(--text-tertiary); animation: pulse 2s ease-in-out infinite; }
+        .loading-sub { font-size: 16px; color: var(--text-tertiary); animation: pulse 2s ease-in-out infinite; }
+        .loading-note {
+            font-size: 12px; color: var(--text-tertiary); margin-top: 16px;
+            max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.5;
+        }
         @keyframes pulse { 0%,100%{opacity:0.5;} 50%{opacity:1;} }
 
         .load-more-sentinel { height: 1px; width: 100%; }
 
-        /* ========== DETAIL VIEW ========== */
-        .detail-back-arrow {
-            display: none; font-size: 20px; color: var(--text-secondary);
-            cursor: pointer; background: none; border: none;
-            padding: 4px 8px; line-height: 1; transition: color 0.2s;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .detail-back-arrow:hover { color: var(--text-primary); }
-        .detail-back-arrow.visible { display: block; }
-
-        .detail-view { display: none; background: var(--bg); min-height: calc(100vh - 60px); }
+        /* ========== DETAIL PAGE VIEW ========== */
+        .detail-view { display: none; background: var(--bg); }
         .detail-view.visible { display: block; }
+        .detail-back {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 14px; color: var(--text-secondary); cursor: pointer;
+            background: none; border: none; font-family: 'DM Sans', sans-serif;
+            padding: 16px 24px 8px; transition: color 0.2s;
+        }
+        .detail-back:hover { color: var(--text-primary); }
         .detail-layout {
             display: grid; grid-template-columns: 1fr 1fr;
             max-width: 1400px; margin: 0 auto; gap: 0;
-            min-height: 100vh;
         }
         .detail-image {
             position: sticky; top: 56px; height: calc(100vh - 56px);
@@ -265,64 +305,66 @@
         .detail-image img {
             max-width: 100%; max-height: 75vh;
             object-fit: contain; display: block;
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1); border-radius: 4px;
         }
-        .detail-image .placeholder-detail {
-            display: flex; flex-direction: column; align-items: center;
-            gap: 8px; padding: 40px; color: var(--text-tertiary);
-        }
-        .detail-image .placeholder-detail span:first-child { font-size: 48px; opacity: 0.3; }
-        .detail-info {
-            padding: 40px 48px 60px;
-        }
-        .detail-museum-badge { margin-bottom: 12px; }
+        .detail-info-col { padding: 32px 40px 60px; }
         .detail-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 28px; font-weight: 600; line-height: 1.3;
-            color: var(--text-primary); margin-bottom: 4px;
+            font-size: 26px; font-weight: 600; line-height: 1.3; margin-bottom: 4px;
         }
-        .detail-title-en {
-            font-size: 16px; color: var(--text-secondary);
-            font-style: italic; margin-bottom: 8px;
+        .detail-translation {
+            font-style: italic; color: var(--text-secondary);
+            font-size: 16px; margin-bottom: 12px; display: none;
         }
-        .detail-date { font-size: 15px; color: var(--text-secondary); margin-bottom: 4px; }
-        .detail-artist { font-size: 15px; margin-bottom: 4px; }
-        .detail-artist-bio { font-size: 13px; color: var(--text-tertiary); margin-bottom: 4px; }
-        .detail-medium { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
-        .detail-culture { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
-        .detail-match {
-            display: inline-block; font-size: 13px; font-weight: 500;
-            padding: 4px 12px; border-radius: var(--radius-full);
-            background: rgba(0,0,0,0.08); color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        .detail-divider { height: 1px; background: var(--border); margin: 20px 0; }
-        .detail-tags-title {
-            font-size: 13px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 8px;
-        }
-        .detail-tags-empty { font-size: 13px; color: var(--text-tertiary); font-style: italic; margin-bottom: 16px; }
-        .detail-tags-list { margin-bottom: 20px; }
-        .tag-chip {
-            display: inline-block; font-size: 12px; padding: 4px 10px;
-            border-radius: 999px; border: 1px solid var(--border);
-            color: var(--text-secondary); background: transparent;
-            margin: 0 6px 6px 0; line-height: 1.4;
+        .detail-meta {
+            font-size: 14px; color: var(--text-secondary);
+            line-height: 1.8; margin-bottom: 16px;
         }
         .detail-source-link {
-            font-size: 14px; color: var(--text-secondary);
-            text-decoration: none; transition: color 0.2s;
+            font-size: 14px; color: var(--text-primary);
+            text-decoration: none; font-weight: 500;
         }
-        .detail-source-link:hover { color: var(--text-primary); }
-        .detail-description {
-            font-size: 14px; line-height: 1.6; color: var(--text-secondary);
-            margin-bottom: 4px;
+        .detail-source-link:hover { text-decoration: underline; }
+        .detail-relevance {
+            background: var(--search-bg); border-radius: 12px;
+            padding: 16px 20px; margin: 20px 0 24px; display: none;
         }
-
+        .detail-relevance h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+        .detail-reason { font-style: italic; font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .detail-scores { font-size: 12px; color: var(--text-tertiary); }
+        .detail-tags-section { margin-bottom: 20px; }
+        .detail-tags-section h3 {
+            font-size: 13px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--text-tertiary); margin-bottom: 10px;
+        }
+        .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag-chip {
+            padding: 4px 12px; border-radius: 999px; font-size: 12px;
+            font-family: 'DM Sans', sans-serif; display: inline-block;
+        }
+        .tag-museum { background: var(--search-bg); color: var(--text-secondary); }
+        .tag-ai { background: #eef2ff; color: #4a5568; }
+        .no-tags { font-size: 13px; color: var(--text-tertiary); font-style: italic; }
+        .detail-research-section {
+            margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
+        }
+        .detail-research-section h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+        .research-loading { font-size: 13px; color: var(--text-tertiary); font-style: italic; }
+        .research-terms { font-size: 12px; color: var(--text-tertiary); margin-bottom: 12px; }
+        .research-list { display: flex; flex-direction: column; gap: 12px; }
+        .research-paper { padding: 12px; background: var(--card-bg); border-radius: 8px; }
+        .paper-title { font-size: 14px; font-weight: 500; color: var(--text-primary); text-decoration: none; }
+        .paper-title:hover { text-decoration: underline; }
+        .paper-meta { font-size: 12px; color: var(--text-tertiary); margin-top: 4px; }
+        .paper-abstract { font-size: 12px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+        .no-research { font-size: 13px; color: var(--text-tertiary); font-style: italic; }
+        .research-more { margin-top: 12px; }
+        .research-more a { font-size: 13px; color: var(--text-secondary); text-decoration: none; }
+        .research-more a:hover { text-decoration: underline; }
         @media (max-width: 768px) {
             .detail-layout { grid-template-columns: 1fr; }
-            .detail-image { position: relative; height: auto; max-height: 60vh; }
-            .detail-info { padding: 24px 20px 48px; }
+            .detail-image { position: relative; top: auto; height: auto; max-height: 60vh; }
+            .detail-info-col { padding: 24px 20px 48px; }
         }
     </style>
 </head>
@@ -330,7 +372,6 @@
 
     <div class="top-bar">
         <div class="search-row">
-            <button class="detail-back-arrow" id="detailBackArrow">&larr;</button>
             <div class="brand" id="brandLink">Museum Search</div>
             <div class="search-wrapper">
                 <input class="search-input" type="text" id="searchInput"
@@ -375,20 +416,57 @@
         <button class="results-clear" id="resultsClear">Clear search</button>
     </div>
 
-    <div class="gallery-wrapper">
-        <div class="masonry" id="masonry"></div>
-        <div class="load-more-sentinel" id="loadMoreSentinel"></div>
-        <div class="explore-more" id="exploreMore">
-            <div class="explore-info">Showing <span id="showingCount">0</span> re-ranked results from 14,000 artworks</div>
-            <button class="explore-btn" id="exploreBtn">Explore 100 more artworks</button>
+    <div class="gallery-wrapper browse-mode" id="galleryWrapper">
+        <div class="sidebar-filters" id="sidebarFilters" style="display:none;">
+            <div class="sidebar-section" id="matchFilterSection">
+                <h4 class="sidebar-title">Match</h4>
+                <div class="sidebar-options" id="matchFilters"></div>
+            </div>
+            <div class="sidebar-section" id="classFilterSection">
+                <h4 class="sidebar-title">Type</h4>
+                <div class="sidebar-options" id="classFilters"></div>
+            </div>
+            <div class="sidebar-section" id="timeFilterSection">
+                <h4 class="sidebar-title">Period</h4>
+                <div class="sidebar-options" id="timeFilters"></div>
+            </div>
+        </div>
+        <div class="masonry-wrapper">
+            <div class="masonry" id="masonry"></div>
+            <div class="load-more-sentinel" id="loadMoreSentinel"></div>
+            <div class="explore-more" id="exploreMore">
+                <div class="explore-info">Showing <span id="showingCount">0</span> re-ranked results from 14,000 artworks</div>
+                <button class="explore-btn" id="exploreBtn">Explore 100 more artworks</button>
+            </div>
         </div>
     </div>
 
-    <!-- ARTWORK DETAIL VIEW -->
+    <!-- ARTWORK DETAIL PAGE VIEW -->
     <div class="detail-view" id="detailView">
+        <button class="detail-back" id="detailBack">&larr; Back to results</button>
         <div class="detail-layout">
             <div class="detail-image" id="detailImage"></div>
-            <div class="detail-info" id="detailInfo"></div>
+            <div class="detail-info-col">
+                <div id="detailInfo"></div>
+                <div class="detail-relevance" id="detailRelevance">
+                    <h3>Why this result?</h3>
+                    <p class="detail-reason" id="detailReason"></p>
+                    <p class="detail-scores" id="detailScores"></p>
+                </div>
+                <div class="detail-tags-section">
+                    <h3>Museum Tags</h3>
+                    <div class="detail-tags" id="detailMuseumTags"></div>
+                </div>
+                <div class="detail-tags-section">
+                    <h3>AI Semantic Tags</h3>
+                    <div class="detail-tags" id="detailAITags"></div>
+                </div>
+                <div class="detail-research-section">
+                    <h3>Related Research</h3>
+                    <div class="research-loading" id="researchLoading">Finding related research papers...</div>
+                    <div id="researchResults"></div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -427,6 +505,10 @@ let hasMore = false;
 let searchExplanation = '';
 let searchExactCount = 0;
 let savedScrollY = 0;
+let isDetailView = false;
+let activeMatchFilter = 'all';
+let activeClassFilter = 'all';
+let activeTimeFilter = 'all';
 
 // ============ IMAGE QUEUE ============
 const imageQueue = [];
@@ -519,7 +601,10 @@ function createCard(art, index) {
     card.className = 'card' + (hasScore ? ' has-score' : '');
     card.style.animationDelay = `${Math.min(index * 0.04, 0.8)}s`;
 
-    card.addEventListener('click', () => openArtworkDetail(art));
+    card.addEventListener('click', () => {
+        const ctx = isSearchMode ? { rerank_score: art.rerank_score, rerank_reason: art.rerank_reason, cosine_score: art.cosine_score } : null;
+        openDetailPanel(art.id, ctx);
+    });
 
     const imgW = document.createElement('div');
     imgW.className = 'card-image-wrapper';
@@ -612,7 +697,7 @@ function renderGallery() {
         const el = document.createElement('div');
         el.className = 'search-loading-overlay';
         el.id = 'searchLoadingEl';
-        el.innerHTML = '<div class="spinner"></div><div class="loading-msg">Searching and curating results...</div><div class="loading-sub" id="loadingSub">Analyzing artworks across 7 museums...</div>';
+        el.innerHTML = '<div class="spinner"></div><div class="loading-msg">Searching and curating results...</div><div class="loading-sub" id="loadingSub">Understanding your search intent...</div>';
         masonry.appendChild(el);
         return;
     }
@@ -645,6 +730,162 @@ function updateStats() {
     }
 }
 
+function extractYear(dateStr) {
+    if (!dateStr) return null;
+    const m = dateStr.match(/(\d{4})/);
+    return m ? parseInt(m[1]) : null;
+}
+
+function getTimeBucket(year) {
+    if (year === null) return null;
+    if (year < 500) return 'Ancient';
+    if (year < 1400) return 'Medieval';
+    if (year < 1600) return '1400\u20131600';
+    if (year < 1800) return '1600\u20131800';
+    if (year < 1900) return '1800\u20131900';
+    return '1900\u2013present';
+}
+
+const TIME_BUCKETS = ['Ancient', 'Medieval', '1400\u20131600', '1600\u20131800', '1800\u20131900', '1900\u2013present'];
+
+function applySearchFilters() {
+    let pool = searchReranked;
+    // Museum filter
+    if (activeFilter !== 'all') pool = pool.filter(r => r.source_museum_code === activeFilter);
+    // Match filter
+    if (activeMatchFilter === 'strong') pool = pool.filter(r => r.rerank_score >= 70);
+    else if (activeMatchFilter === 'related') pool = pool.filter(r => r.rerank_score >= 30 && r.rerank_score < 70);
+    else pool = pool.filter(r => r.rerank_score >= 30); // 'all' excludes < 30
+    // Classification filter
+    if (activeClassFilter !== 'all') {
+        if (activeClassFilter === '__other__') {
+            const topCls = getTopClassifications(pool, 6).map(c => c[0]);
+            pool = pool.filter(r => !topCls.includes(r.classification || ''));
+        } else {
+            pool = pool.filter(r => (r.classification || '') === activeClassFilter);
+        }
+    }
+    // Time filter
+    if (activeTimeFilter !== 'all') {
+        pool = pool.filter(r => getTimeBucket(extractYear(r.date)) === activeTimeFilter);
+    }
+    displayedArtworks = pool;
+    renderGallery();
+    updateStats();
+    updateResultsHeader();
+    updateExploreMore();
+}
+
+function getTopClassifications(pool, n) {
+    const counts = {};
+    for (const r of pool) {
+        const c = r.classification || '';
+        if (c) counts[c] = (counts[c] || 0) + 1;
+    }
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    return sorted.slice(0, n);
+}
+
+function updateSearchFilters() {
+    const sidebar = document.getElementById('sidebarFilters');
+    const matchEl = document.getElementById('matchFilters');
+    const classEl = document.getElementById('classFilters');
+    const timeEl = document.getElementById('timeFilters');
+    const wrapper = document.getElementById('galleryWrapper');
+
+    if (!isSearchMode || isLoading) {
+        sidebar.style.display = 'none';
+        wrapper.classList.add('browse-mode');
+        return;
+    }
+
+    sidebar.style.display = '';
+    wrapper.classList.remove('browse-mode');
+
+    // Base pool after museum filter only
+    let base = searchReranked;
+    if (activeFilter !== 'all') base = base.filter(r => r.source_museum_code === activeFilter);
+
+    // For match section: apply class + time filters
+    let forMatch = base;
+    if (activeClassFilter !== 'all') {
+        if (activeClassFilter === '__other__') {
+            const topCls = getTopClassifications(base, 6).map(c => c[0]);
+            forMatch = forMatch.filter(r => !topCls.includes(r.classification || ''));
+        } else forMatch = forMatch.filter(r => (r.classification || '') === activeClassFilter);
+    }
+    if (activeTimeFilter !== 'all') forMatch = forMatch.filter(r => getTimeBucket(extractYear(r.date)) === activeTimeFilter);
+
+    const strongCount = forMatch.filter(r => r.rerank_score >= 70).length;
+    const relatedCount = forMatch.filter(r => r.rerank_score >= 30 && r.rerank_score < 70).length;
+    const allCount = strongCount + relatedCount;
+
+    matchEl.innerHTML =
+        mkOption('all', 'All', allCount, activeMatchFilter, 'data-match') +
+        mkOption('strong', 'Strong matches', strongCount, activeMatchFilter, 'data-match') +
+        mkOption('related', 'Related', relatedCount, activeMatchFilter, 'data-match');
+
+    // For class section: apply match + time filters
+    let forClass = base;
+    if (activeMatchFilter === 'strong') forClass = forClass.filter(r => r.rerank_score >= 70);
+    else if (activeMatchFilter === 'related') forClass = forClass.filter(r => r.rerank_score >= 30 && r.rerank_score < 70);
+    else forClass = forClass.filter(r => r.rerank_score >= 30);
+    if (activeTimeFilter !== 'all') forClass = forClass.filter(r => getTimeBucket(extractYear(r.date)) === activeTimeFilter);
+
+    const topCls = getTopClassifications(forClass, 6);
+    const topClsNames = new Set(topCls.map(c => c[0]));
+    const otherCount = forClass.filter(r => {
+        const c = r.classification || '';
+        return c && !topClsNames.has(c);
+    }).length;
+
+    if (topCls.length > 0) {
+        document.getElementById('classFilterSection').style.display = '';
+        let html = mkOption('all', 'All', forClass.length, activeClassFilter, 'data-class');
+        for (const [cls, cnt] of topCls) {
+            html += mkOption(cls, cls, cnt, activeClassFilter, 'data-class');
+        }
+        if (otherCount > 0) html += mkOption('__other__', 'Other', otherCount, activeClassFilter, 'data-class');
+        classEl.innerHTML = html;
+    } else {
+        document.getElementById('classFilterSection').style.display = 'none';
+    }
+
+    // For time section: apply match + class filters
+    let forTime = base;
+    if (activeMatchFilter === 'strong') forTime = forTime.filter(r => r.rerank_score >= 70);
+    else if (activeMatchFilter === 'related') forTime = forTime.filter(r => r.rerank_score >= 30 && r.rerank_score < 70);
+    else forTime = forTime.filter(r => r.rerank_score >= 30);
+    if (activeClassFilter !== 'all') {
+        if (activeClassFilter === '__other__') {
+            const tc = getTopClassifications(base, 6).map(c => c[0]);
+            forTime = forTime.filter(r => !tc.includes(r.classification || ''));
+        } else forTime = forTime.filter(r => (r.classification || '') === activeClassFilter);
+    }
+
+    const timeCounts = {};
+    for (const r of forTime) {
+        const b = getTimeBucket(extractYear(r.date));
+        if (b) timeCounts[b] = (timeCounts[b] || 0) + 1;
+    }
+    const activeBuckets = TIME_BUCKETS.filter(b => timeCounts[b] > 0);
+    if (activeBuckets.length > 0) {
+        document.getElementById('timeFilterSection').style.display = '';
+        let html = mkOption('all', 'All', forTime.length, activeTimeFilter, 'data-time');
+        for (const b of activeBuckets) {
+            html += mkOption(b, b, timeCounts[b], activeTimeFilter, 'data-time');
+        }
+        timeEl.innerHTML = html;
+    } else {
+        document.getElementById('timeFilterSection').style.display = 'none';
+    }
+}
+
+function mkOption(value, label, count, activeVal, attr) {
+    const cls = value === activeVal ? 'sidebar-option active' : 'sidebar-option';
+    return `<button class="${cls}" ${attr}="${value}"><span class="check-box"></span>${label}<span class="option-count">${count}</span></button>`;
+}
+
 function updateResultsHeader() {
     const header = document.getElementById('resultsHeader');
     const suggestions = document.getElementById('suggestions');
@@ -652,13 +893,21 @@ function updateResultsHeader() {
         header.classList.add('visible');
         document.getElementById('resultsQuery').textContent = `\u201C${currentQuery}\u201D`;
         const museums = new Set(displayedArtworks.map(a => a.source_museum_code));
-        document.getElementById('resultsCount').textContent = `${displayedArtworks.length} artworks across ${museums.size} museums`;
+        const strong = displayedArtworks.filter(a => a.rerank_score >= 70).length;
+        const related = displayedArtworks.filter(a => a.rerank_score >= 30 && a.rerank_score < 70).length;
+        let countText = '';
+        if (strong > 0) countText += `${strong} strong matches`;
+        if (related > 0) countText += (countText ? ' \u00B7 ' : '') + `${related} related works`;
+        countText += ` \u00B7 across ${museums.size} museums`;
+        document.getElementById('resultsCount').textContent = countText;
         let expText = searchExplanation;
         if (searchExactCount > 0) expText += ` (${searchExactCount} exact matches)`;
         document.getElementById('searchExplanation').textContent = expText;
         suggestions.style.display = 'none';
+        updateSearchFilters();
     } else {
         header.classList.remove('visible');
+        updateSearchFilters();
         suggestions.style.display = isLoading ? 'none' : 'flex';
     }
 }
@@ -667,10 +916,12 @@ function updateLoadingText() {
     const sub = document.getElementById('loadingSub');
     if (!sub) return;
     const elapsed = Math.floor((Date.now() - searchStartTime) / 1000);
-    if (elapsed < 2) sub.textContent = 'Encoding your query...';
-    else if (elapsed < 10) sub.textContent = 'Searching 14,000 artworks...';
-    else if (elapsed < 40) sub.textContent = `AI is evaluating relevance across 7 museums... (${elapsed}s)`;
-    else sub.textContent = `Curating your results... (${elapsed}s)`;
+    if (elapsed < 3) sub.textContent = 'Understanding your search intent...';
+    else if (elapsed < 6) sub.textContent = 'Scanning 14,000 artworks across 7 museums...';
+    else if (elapsed < 15) sub.textContent = 'Evaluating conceptual relevance across cultures...';
+    else if (elapsed < 30) sub.textContent = 'Comparing artworks from different traditions...';
+    else if (elapsed < 50) sub.textContent = 'Finalizing cross-cultural connections...';
+    else sub.textContent = 'Almost there \u2014 refining your results...';
 }
 
 // ============ API ============
@@ -693,7 +944,10 @@ async function performSearch(query) {
     isSearchMode = true;
     currentQuery = query;
     searchStartTime = Date.now();
-    displayedArtworks = [];  // clear previous results so scroll observer can't render them
+    activeMatchFilter = 'all';
+    activeClassFilter = 'all';
+    activeTimeFilter = 'all';
+    displayedArtworks = [];
     renderedCount = 0;
     document.getElementById('resultsHeader').classList.remove('visible');
     document.getElementById('suggestions').style.display = 'none';
@@ -716,20 +970,10 @@ async function performSearch(query) {
         searchExplanation = data.explanation || '';
         searchExactCount = data.exact_match_count || 0;
 
-        // Apply museum filter if active
-        let results = searchReranked;
-        if (activeFilter !== 'all') {
-            results = results.filter(r => r.source_museum_code === activeFilter);
-        }
-
-        displayedArtworks = results;
         isLoading = false;
         if (loadingTimer) { clearInterval(loadingTimer); loadingTimer = null; }
         window.scrollTo({ top: 0, behavior: 'instant' });
-        renderGallery();
-        updateStats();
-        updateResultsHeader();
-        updateExploreMore();
+        applySearchFilters();
     } catch (err) {
         console.error('Search failed:', err);
         isLoading = false;
@@ -755,8 +999,13 @@ function clearSearch() {
     searchReranked = [];
     currentOffset = 0;
     hasMore = false;
+    activeMatchFilter = 'all';
+    activeClassFilter = 'all';
+    activeTimeFilter = 'all';
     document.getElementById('searchInput').value = '';
     document.getElementById('exploreMore').classList.remove('visible');
+    document.getElementById('sidebarFilters').style.display = 'none';
+    document.getElementById('galleryWrapper').classList.add('browse-mode');
     applyBrowseFilter();
 }
 
@@ -764,10 +1013,7 @@ function clearSearch() {
 document.getElementById('searchInput').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') {
         const q = this.value.trim();
-        // Close detail view if open
-        if (document.getElementById('detailView').classList.contains('visible')) {
-            showMainView();
-        }
+        closeDetail();
         if (q) { this.blur(); performSearch(q); }
         else clearSearch();
     }
@@ -783,23 +1029,37 @@ document.getElementById('brandLink').addEventListener('click', () => {
 document.getElementById('filterRow').addEventListener('click', function(e) {
     const chip = e.target.closest('.chip');
     if (!chip) return;
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('#filterRow .chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
     activeFilter = chip.dataset.filter;
     if (isSearchMode) {
-        // Re-filter from cached reranked results (no new API call)
-        let results = searchReranked;
-        if (activeFilter !== 'all') results = results.filter(r => r.source_museum_code === activeFilter);
-        displayedArtworks = results;
-        renderGallery();
-        updateStats();
-        updateResultsHeader();
+        applySearchFilters();
     } else {
         applyBrowseFilter();
     }
 });
 
 document.getElementById('resultsClear').addEventListener('click', clearSearch);
+
+// Sidebar filter clicks
+document.getElementById('matchFilters').addEventListener('click', function(e) {
+    const opt = e.target.closest('.sidebar-option');
+    if (!opt) return;
+    activeMatchFilter = opt.dataset.match;
+    applySearchFilters();
+});
+document.getElementById('classFilters').addEventListener('click', function(e) {
+    const opt = e.target.closest('.sidebar-option');
+    if (!opt) return;
+    activeClassFilter = opt.dataset.class;
+    applySearchFilters();
+});
+document.getElementById('timeFilters').addEventListener('click', function(e) {
+    const opt = e.target.closest('.sidebar-option');
+    if (!opt) return;
+    activeTimeFilter = opt.dataset.time;
+    applySearchFilters();
+});
 
 document.getElementById('suggestions').addEventListener('click', function(e) {
     const chip = e.target.closest('.suggestion-chip');
@@ -870,142 +1130,187 @@ document.getElementById('exploreBtn').addEventListener('click', async function()
     btn.textContent = 'Explore 100 more artworks';
 });
 
-// ============ DETAIL VIEW ============
-function showMainView() {
-    document.getElementById('filterRow').style.display = '';
-    document.getElementById('suggestions').style.display = '';
+// ============ DETAIL PAGE VIEW ============
+function closeDetail() {
+    if (!isDetailView) return;
+    isDetailView = false;
+    document.getElementById('detailView').classList.remove('visible');
     document.getElementById('resultsHeader').style.display = '';
     document.querySelector('.gallery-wrapper').style.display = '';
-    document.getElementById('detailView').classList.remove('visible');
-    document.getElementById('detailBackArrow').classList.remove('visible');
-    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+    document.getElementById('filterRow').style.display = '';
+    document.getElementById('suggestions').style.display = '';
     updateResultsHeader();
+    window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+    history.back();
 }
 
-function hideMainView() {
+document.getElementById('detailBack').addEventListener('click', closeDetail);
+window.addEventListener('popstate', function() {
+    if (isDetailView) {
+        isDetailView = false;
+        document.getElementById('detailView').classList.remove('visible');
+        document.getElementById('resultsHeader').style.display = '';
+        document.querySelector('.gallery-wrapper').style.display = '';
+        document.getElementById('filterRow').style.display = '';
+        document.getElementById('suggestions').style.display = '';
+        updateResultsHeader();
+        window.scrollTo({ top: savedScrollY, behavior: 'instant' });
+    }
+});
+
+async function openDetailPanel(artworkId, searchContext) {
     savedScrollY = window.scrollY;
-    document.getElementById('filterRow').style.display = 'none';
-    document.getElementById('suggestions').style.display = 'none';
+    isDetailView = true;
+
+    // Hide main content
     document.getElementById('resultsHeader').style.display = 'none';
     document.querySelector('.gallery-wrapper').style.display = 'none';
-    document.getElementById('detailBackArrow').classList.add('visible');
-}
+    document.getElementById('filterRow').style.display = 'none';
+    document.getElementById('suggestions').style.display = 'none';
 
-function renderTagChips(tags) {
-    if (!tags || tags.length === 0) return '';
-    return tags.map(t => `<span class="tag-chip">${t}</span>`).join('');
-}
-
-async function openArtworkDetail(art) {
-    hideMainView();
-    document.getElementById('detailView').classList.add('visible');
+    // Show detail view
+    const view = document.getElementById('detailView');
+    view.classList.add('visible');
     window.scrollTo({ top: 0, behavior: 'instant' });
+    history.pushState({ detail: true }, '');
 
-    const code = art.source_museum_code || '';
-    const badgeClass = `museum-badge badge-${code}`;
-    const museumLabel = MUSEUM_LABELS[code] || code;
+    // Reset
+    document.getElementById('detailImage').innerHTML = '';
+    document.getElementById('detailInfo').innerHTML = '<div style="color:var(--text-tertiary)">Loading...</div>';
+    document.getElementById('detailMuseumTags').innerHTML = '';
+    document.getElementById('detailAITags').innerHTML = '';
+    document.getElementById('researchLoading').style.display = 'block';
+    document.getElementById('researchResults').innerHTML = '';
+    document.getElementById('researchResults').style.display = 'none';
 
-    // Render image
-    const imgEl = document.getElementById('detailImage');
-    if (art.image_url) {
-        imgEl.innerHTML = `<img src="${art.image_url}" alt="${(art.title||'').replace(/"/g,'&quot;')}" />`;
-        const img = imgEl.querySelector('img');
-        img.onerror = function() {
-            imgEl.innerHTML = `<div class="placeholder-detail"><span>\u{1F3DB}</span><span>${(art.title||'Untitled').slice(0,80)}</span></div>`;
-        };
+    // Relevance
+    const relDiv = document.getElementById('detailRelevance');
+    if (searchContext && searchContext.rerank_reason) {
+        relDiv.style.display = 'block';
+        document.getElementById('detailReason').textContent = '"' + searchContext.rerank_reason + '"';
+        document.getElementById('detailScores').textContent =
+            'AI relevance score: ' + searchContext.rerank_score + '/100' +
+            (searchContext.cosine_score ? ' \u00B7 Semantic similarity: ' + searchContext.cosine_score.toFixed(3) : '');
     } else {
-        imgEl.innerHTML = `<div class="placeholder-detail"><span>\u{1F3DB}</span><span>${(art.title||'Untitled').slice(0,80)}</span></div>`;
+        relDiv.style.display = 'none';
     }
 
-    // Build info — basic fields first (available immediately)
-    const matchHtml = (isSearchMode && art.rerank_score != null)
-        ? `<div class="detail-match">${art.rerank_score}% match</div>` : '';
-    const reasonHtml = (isSearchMode && art.rerank_reason)
-        ? `<div style="font-size:13px;color:var(--text-tertiary);font-style:italic;margin-bottom:4px;">${art.rerank_reason}</div>` : '';
-
-    let artistLine = '';
-    if (art.artist && art.artist !== 'Unknown') artistLine = `<div class="detail-artist">${art.artist}</div>`;
-
-    let dateLine = '';
-    if (art.date) dateLine = `<div class="detail-date">${art.date}</div>`;
-
-    let mediumLine = '';
-    if (art.medium) mediumLine = `<div class="detail-medium">${art.medium}</div>`;
-
-    let cultureLine = '';
-    if (art.culture) cultureLine = `<div class="detail-culture">Culture: ${art.culture}</div>`;
-
-    const infoEl = document.getElementById('detailInfo');
-    infoEl.innerHTML = `
-        <div class="detail-museum-badge"><span class="${badgeClass}">${museumLabel}</span></div>
-        <div class="detail-title">${art.title || 'Untitled'}</div>
-        <div id="detailTitleEn"></div>
-        ${dateLine}
-        ${artistLine}
-        <div id="detailArtistBio"></div>
-        ${mediumLine}
-        ${cultureLine}
-        ${matchHtml}
-        ${reasonHtml}
-        <div class="detail-divider"></div>
-        <div id="detailTagsSection"><div style="font-size:13px;color:var(--text-tertiary);">Loading tags...</div></div>
-        <div class="detail-divider"></div>
-        ${art.source_url ? `<a class="detail-source-link" href="${art.source_url}" target="_blank">View on museum website \u2192</a>` : ''}
-    `;
-
-    // Fetch full details (tags, translations)
+    // Fetch artwork details
     try {
-        const res = await fetch(`${API_BASE}/api/artwork/${encodeURIComponent(art.id)}`);
+        const res = await fetch(API_BASE + '/api/artwork/' + encodeURIComponent(artworkId));
         if (!res.ok) throw new Error('Not found');
-        const data = await res.json();
+        const art = await res.json();
 
-        // Louvre translation subtitle
-        if (data.louvre_translation && data.louvre_translation.title) {
-            document.getElementById('detailTitleEn').innerHTML =
-                `<div class="detail-title-en">${data.louvre_translation.title}</div>`;
-        }
-
-        // Artist bio
-        const bio = data.artist_bio ? data.artist_bio.trim() : '';
-        if (bio && bio !== ' ') {
-            document.getElementById('detailArtistBio').innerHTML =
-                `<div class="detail-artist-bio">${bio}</div>`;
-        }
-
-        // Description
-        const desc = data.description || '';
-        const descHtml = desc ? `<div class="detail-description">${desc}</div><div class="detail-divider"></div>` : '';
-
-        // Tags
-        const origTags = data.original_tags || [];
-        const llmTags = data.llm_tags || [];
-
-        let tagsHtml = '';
-        if (desc) tagsHtml += descHtml;
-
-        tagsHtml += `<div class="detail-tags-title">Museum Tags</div>`;
-        if (origTags.length > 0) {
-            tagsHtml += `<div class="detail-tags-list">${renderTagChips(origTags)}</div>`;
+        // Image
+        const imgDiv = document.getElementById('detailImage');
+        if (art.image_url) {
+            const img = document.createElement('img');
+            img.src = art.image_url;
+            img.alt = art.title || '';
+            img.onerror = function() { imgDiv.innerHTML = '<div style="padding:40px;color:var(--text-tertiary);text-align:center">\u{1F3DB} Image unavailable</div>'; };
+            imgDiv.appendChild(img);
         } else {
-            tagsHtml += `<div class="detail-tags-empty">No tags provided by museum</div>`;
+            imgDiv.innerHTML = '<div style="padding:40px;color:var(--text-tertiary);text-align:center">\u{1F3DB} No image</div>';
         }
 
-        tagsHtml += `<div class="detail-tags-title">LLM Enriched Tags</div>`;
-        if (llmTags.length > 0) {
-            tagsHtml += `<div class="detail-tags-list">${renderTagChips(llmTags)}</div>`;
-        } else {
-            tagsHtml += `<div class="detail-tags-empty">No enriched tags available</div>`;
+        // Info
+        const code = art.source_museum_code || '';
+        const museumLabel = MUSEUM_LABELS[code] || code;
+        const metaParts = [];
+        if (art.artist && art.artist !== 'Unknown') metaParts.push(art.artist);
+        if (art.date) metaParts.push(art.date);
+        if (art.culture) metaParts.push(art.culture);
+        if (art.period) metaParts.push(art.period);
+        if (art.medium) metaParts.push(art.medium);
+        if (art.classification) metaParts.push(art.classification);
+        if (art.department) metaParts.push(art.department);
+        metaParts.push(art.source_museum || '');
+
+        let titleHtml = '<div class="detail-title">' + (art.title || 'Untitled') + '</div>';
+        const trans = art.louvre_translation;
+        if (trans && trans.title) {
+            titleHtml += '<div class="detail-translation" style="display:block">' + trans.title + '</div>';
         }
 
-        document.getElementById('detailTagsSection').innerHTML = tagsHtml;
+        document.getElementById('detailInfo').innerHTML =
+            '<span class="museum-badge badge-' + code + '" style="margin-bottom:12px;display:inline-block">' + museumLabel + '</span>' +
+            titleHtml +
+            '<div class="detail-meta">' + metaParts.join('<br>') + '</div>' +
+            (art.source_url ? '<a class="detail-source-link" href="' + art.source_url + '" target="_blank">View on museum website \u2192</a>' : '');
+
+        // Museum tags
+        const origTags = art.original_tags || [];
+        document.getElementById('detailMuseumTags').innerHTML = origTags.length > 0
+            ? origTags.map(function(t) { return '<span class="tag-chip tag-museum">' + t + '</span>'; }).join('')
+            : '<em class="no-tags">No original museum tags for this work</em>';
+
+        // AI tags — grouped by category
+        const catTags = art.categorized_tags || {};
+        const catLabels = {
+            medium_technique: 'Medium & Technique',
+            style_period: 'Style & Period',
+            subject_form: 'Subject & Form',
+            theme_concept: 'Theme & Concept',
+        };
+        const catOrder = ['medium_technique', 'style_period', 'subject_form', 'theme_concept'];
+        let aiHtml = '';
+        let first = true;
+        for (const cat of catOrder) {
+            const tags = catTags[cat] || [];
+            if (tags.length === 0) continue;
+            const mt = first ? '' : 'margin-top:12px;';
+            first = false;
+            aiHtml += '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:6px;' + mt + '">' + catLabels[cat] + '</div>';
+            aiHtml += '<div class="detail-tags">' + tags.map(function(t) { return '<span class="tag-chip tag-ai">' + t + '</span>'; }).join('') + '</div>';
+        }
+        document.getElementById('detailAITags').innerHTML = aiHtml || '<em class="no-tags">No AI tags</em>';
+
     } catch (err) {
-        document.getElementById('detailTagsSection').innerHTML =
-            '<div style="font-size:13px;color:var(--text-tertiary);">Could not load tag details</div>';
+        document.getElementById('detailInfo').innerHTML = '<div style="color:var(--text-tertiary)">Could not load artwork details</div>';
     }
+
+    // Async: load research
+    loadRelatedResearch(artworkId);
 }
 
-// ============ DETAIL BACK ARROW ============
-document.getElementById('detailBackArrow').addEventListener('click', showMainView);
+async function loadRelatedResearch(artworkId) {
+    const loadingDiv = document.getElementById('researchLoading');
+    const resultsDiv = document.getElementById('researchResults');
+    try {
+        const res = await fetch(API_BASE + '/api/artwork/' + encodeURIComponent(artworkId) + '/research');
+        const data = await res.json();
+        loadingDiv.style.display = 'none';
+        resultsDiv.style.display = 'block';
+
+        if (data.papers && data.papers.length > 0) {
+            let html = '';
+            if (data.search_terms && data.search_terms.length > 0) {
+                html += '<p class="research-terms">Based on: ' + data.search_terms.map(function(t) { return '"' + t + '"'; }).join(', ') + '</p>';
+            }
+            html += '<div class="research-list">';
+            for (const paper of data.papers) {
+                const authors = paper.authors ? paper.authors.join(', ') : 'Unknown';
+                const year = paper.year || '';
+                const citations = paper.citations || 0;
+                html += '<div class="research-paper">' +
+                    '<a href="' + (paper.url || '#') + '" target="_blank" class="paper-title">' + (paper.title || '') + '</a>' +
+                    '<div class="paper-meta">' + authors + (year ? ' \u00B7 ' + year : '') + ' \u00B7 Cited ' + citations + ' times</div>' +
+                    (paper.abstract ? '<p class="paper-abstract">' + paper.abstract + '</p>' : '') +
+                    '</div>';
+            }
+            html += '</div>';
+            const scholarQ = encodeURIComponent(data.search_terms[0] || '');
+            html += '<div class="research-more"><a href="https://scholar.google.com/scholar?q=' + scholarQ + '" target="_blank">\uD83D\uDD17 Search more on Google Scholar</a></div>';
+            resultsDiv.innerHTML = html;
+        } else {
+            resultsDiv.innerHTML = '<p class="no-research">No academic papers found \u2014 this may be an understudied work, representing a potential research opportunity.</p>';
+        }
+    } catch (err) {
+        loadingDiv.style.display = 'none';
+        resultsDiv.style.display = 'block';
+        resultsDiv.innerHTML = '<p class="no-research">Could not load research papers.</p>';
+    }
+}
 
 // ============ INIT ============
 loadAllArtworks();
