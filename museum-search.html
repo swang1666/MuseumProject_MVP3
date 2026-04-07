@@ -344,6 +344,8 @@
         }
         .tag-museum { background: var(--search-bg); color: var(--text-secondary); }
         .tag-ai { background: #eef2ff; color: #4a5568; }
+        .tag-chip.clickable { cursor: pointer; transition: background 0.2s, color 0.2s; }
+        .tag-chip.clickable:hover { background: rgba(0,0,0,0.08); color: var(--text-primary); }
         .no-tags { font-size: 13px; color: var(--text-tertiary); font-style: italic; }
         .detail-research-section {
             margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);
@@ -1145,6 +1147,15 @@ function closeDetail() {
 }
 
 document.getElementById('detailBack').addEventListener('click', closeDetail);
+document.getElementById('detailAITags').addEventListener('click', function(e) {
+    const chip = e.target.closest('.tag-chip.clickable');
+    if (!chip) return;
+    const tag = chip.dataset.tag;
+    if (!tag) return;
+    closeDetail();
+    document.getElementById('searchInput').value = tag;
+    performSearch(tag);
+});
 window.addEventListener('popstate', function() {
     if (isDetailView) {
         isDetailView = false;
@@ -1261,7 +1272,7 @@ async function openDetailPanel(artworkId, searchContext) {
             const mt = first ? '' : 'margin-top:12px;';
             first = false;
             aiHtml += '<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-tertiary);margin-bottom:6px;' + mt + '">' + catLabels[cat] + '</div>';
-            aiHtml += '<div class="detail-tags">' + tags.map(function(t) { return '<span class="tag-chip tag-ai">' + t + '</span>'; }).join('') + '</div>';
+            aiHtml += '<div class="detail-tags">' + tags.map(function(t) { return '<span class="tag-chip tag-ai clickable" data-tag="' + t.replace(/"/g, '&quot;') + '">' + t + '</span>'; }).join('') + '</div>';
         }
         document.getElementById('detailAITags').innerHTML = aiHtml || '<em class="no-tags">No AI tags</em>';
 
